@@ -3,7 +3,7 @@
 <head>
     <link rel="stylesheet" href="">
     <script>
-    const interval = 500;
+    const interval = 350;
     var lock = false;
     
     // called when typing in search bar
@@ -22,18 +22,21 @@
         var input = document.getElementById("search");
         var filter = input.value.toUpperCase();
         var table = document.getElementById("blocks");
-        var tr = table.getElementsByTagName("tr");
-        for (var i = 1; i < tr.length; i++) {
-            var els = tr[i].getElementsByTagName("td");
+        
+        // loops over each row then each td for that row
+        var rows = table.getElementsByTagName("tr");
+        for (var i = 1; i < rows.length; i++) {
+            var row = rows[i];
+            var elements = row.getElementsByTagName("td");
             var display = "none";
-            for (var j = 0; j < els.length; j++) {
-                var td = els[j];
+            for (var j = 0; j < elements.length; j++) {
+                var td = elements[j];
                 if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
                     display = "table-row";
                     break;
                 }
             }
-            tr[i].style.display = display;
+            row.style.display = display;
         }
         //unset the lock
         lock = false;
@@ -42,6 +45,8 @@
     <script>
     window.document.addEventListener("DOMContentLoaded", function() {
         var rows = document.getElementsByTagName("tr");
+        // loop over table rows, set img.src and make row visible once it loads/errors
+        // starts at 1 since row[0] is the header bar
         for (var i = 1; i < rows.length; i++) {
             var row = rows[i];
             var imgs = row.getElementsByTagName("img");
@@ -49,14 +54,28 @@
                 var img = imgs[0];
                 img.src = img.getAttribute("data-src");
                 img.onload = function() {
+                    // markup is tr>td>img, row is therefore the img's parent's parent ie this.parentElement.parentElement
                     var parent = this.parentElement.parentElement;
                     parent.style.opacity = 1;
                     parent.style.display = "table-row";
-                    this.removeAttribute("data-src");
+                    img.removeAttribute("data-src");
+                }
+                img.onerror = function() {
+                    // show row anyway
+                    this.onload();
+                    // hides the error icon but maintains the spacing for the image
+                    this.style.opacity = 0;
                 };
             }
         }
     });
+    
+    function showRow(img) {
+        var parent = img.parentElement.parentElement;
+        parent.style.opacity = 1;
+        parent.style.display = "table-row";
+        img.removeAttribute("data-src");
+    }
     </script>
     <style>
     body {
@@ -106,6 +125,7 @@
     table {
         width: 100%;
         border-collapse: collapse;
+        background-color: #ffffff;
     }
     th {
         text-align: left;
@@ -125,7 +145,6 @@
         opacity: 0;
         display: none;
         transition: opacity .5s;
-        background-color: #ffffff;
     }
     tr td:nth-child(1), .trh th:nth-child(1) {
         width: 52px;
