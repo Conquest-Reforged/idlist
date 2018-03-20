@@ -3,7 +3,7 @@
 <head>
     <link rel="stylesheet" href="">
     <script>
-    const interval = 250;
+    const interval = 500;
     var lock = false;
     
     // called when typing in search bar
@@ -29,8 +29,7 @@
             for (var j = 0; j < els.length; j++) {
                 var td = els[j];
                 if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    display = "";
-                    tr[i].style.display = "";
+                    display = "table-row";
                     break;
                 }
             }
