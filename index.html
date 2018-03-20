@@ -2,48 +2,43 @@
 <html>
 <head>
     <link rel="stylesheet" href="">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
-        //Making the jQuery contains expr check for all cases
-        //source : https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
-        $.expr[":"].contains = $.expr.createPseudo(function(arg) {
-            return function( elem ) {
-                return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
-            };
-        });
-        //End snippet
-
-        //Delay function before applying filter
-        //Source : https://stackoverflow.com/a/1909508
-        var delay = (function(){
-          var timer = 0;
-          return function(callback, ms){
-            clearTimeout (timer);
-            timer = setTimeout(callback, ms);
-          };
-        })();
-        //End snippet
-
-
-        function filter() {
-            delay(function() {
-                //Sam's edit
-                var filter = $("#search").val();
-                
-                //if a filter present
-                if (filter != '') {
-                    //hide all rows
-                    $('table#blocks tbody tr').css('display','none');
-                    //show those that match
-                    $('table#blocks tbody tr:contains("' + filter + '")').css('display','table-row');
-                } else {
-                    //show all rows
-                    $('table#blocks tbody tr').css('display','table-row');
-                }
-                //End Sam's edit
-
-            }, 500 );
+    const interval = 250;
+    var lock = false;
+    
+    // called when typing in search bar
+    // searches are rate-limited to 'interval' milliseconds
+    function filter() {
+        if (lock) {
+            return;
         }
+        window.setTimeout(search, interval);
+    }
+    
+    // loops through each row to find string matches for the search term
+    function search() {
+        // set the lock
+        lock = true;
+        var input = document.getElementById("search");
+        var filter = input.value.toUpperCase();
+        var table = document.getElementById("blocks");
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 1; i < tr.length; i++) {
+            var els = tr[i].getElementsByTagName("td");
+            var display = "none";
+            for (var j = 0; j < els.length; j++) {
+                var td = els[j];
+                if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    display = "";
+                    tr[i].style.display = "";
+                    break;
+                }
+            }
+            tr[i].style.display = display;
+        }
+        //unset the lock
+        lock = false;
+    }
     </script>
     <style>
     body {
@@ -51,10 +46,8 @@
         padding: 0;
         margin: 0;
         color: #505050;
-        background-image: url(https://static.planetminecraft.com/files/resource_media/screenshot/1713/dgcbm6v10937227.png);
-        background-repeat: no-repeat;
+        background: url(./background.jpg) no-repeat center;
         background-size: cover;
-        background-position: top;
         background-attachment: fixed;
     }
     .title-bar {
@@ -64,13 +57,12 @@
         left: 0;
         background-color: #ffffff;
         box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.25);
-
     }
     .search-wrapper {
         position: relative;
-        width: 50%;
+        width: 90%;
+        max-width: 850;
         margin: auto auto;
-
     }
     .search {
         width: 100%;
@@ -82,15 +74,11 @@
         box-shadow: 0 0 1px 2px rgba(0, 0, 0, 0.25) inset;
     }
     .content {
-        width: 60%;
+        width: 90%;
+        max-width: 850;
         margin: 60px auto 60px auto;
-        background-color: #ffffff;
         box-shadow: 0 0 11px 0px rgba(0, 0, 0, 0.25);
-                overflow: hidden;
-
-
     }
-
     a.anchor {
         display: block;
         position: relative;
@@ -100,27 +88,26 @@
     table {
         width: 100%;
         border-collapse: collapse;
-
-
     }
-    tr:nth-child(odd) {
-        background-color: #eeeeee;
-    }
-    tr:hover {
-        box-shadow: 0 0 0px 2px rgba(4, 4, 4, 0.5) inset;
-    }
-
     th {
         text-align: left;
-        padding: 15 20 10 20;
+        padding: 10px;
         white-space: nowrap;
-        background-color: limegreen;
+        background-color: #4caf50;
         color: #ffffff;
     }
     td {
-        padding: 10 20 10 20;
+        padding: 10px;
     }
-
+    tr {
+        background-color: #ffffff;
+    }
+    tr:nth-child(odd) {
+        background-color: #fafafa;
+    }
+    tr:hover {
+        box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1) inset;
+    }
     </style>
 </head>
 <body>
